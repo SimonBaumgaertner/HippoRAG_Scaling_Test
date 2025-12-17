@@ -1,0 +1,9 @@
+venv
+HotpotQA_Dev
+src/models/openrouter.txt
+hipporag_test_run/
+__pycache__/
+*.py[cod]
+*$py.class
+.cache
+.DS_Store

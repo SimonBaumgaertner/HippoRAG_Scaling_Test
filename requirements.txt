@@ -1,0 +1,6 @@
+
+openai
+numpy==1.26.4
+sentence-transformers==3.0.1
+hipporag==2.0.0a4
+
