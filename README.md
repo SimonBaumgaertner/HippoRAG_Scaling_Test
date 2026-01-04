@@ -23,7 +23,7 @@ The plot below shows the relationship between the number of documents and the to
 
 *The plot includes a quadratic fit and a linear reference line based on the initial 20-80 document performance.*
 
-I have already created a [Github Issue]([https://github.com/OSU-NLP-Group/HippoRAG/issues/170]) where I describe my initial suspicions and even go into a shallow analysis why this happens. Note though that I have used some 'patches' trying to fix the scaling issue (and though fixing the clear quadratic 'bug' described in the issue may help with performance) it's still quadradic after. I decided to use the vanilla HippoRAG without my patches to not introduce any additional potential error sources and show the pattern clearly.
+I have already created a [Github Issue](https://github.com/OSU-NLP-Group/HippoRAG/issues/170) where I describe my initial suspicions and even go into a shallow analysis why this happens. Note though that I have used some 'patches' trying to fix the scaling issue (and though fixing the clear quadratic 'bug' described in the issue may help with performance) it's still quadradic after. I decided to use the vanilla HippoRAG without my patches to not introduce any additional potential error sources and show the pattern clearly.
 
 ## Setup & Troubleshooting
 
