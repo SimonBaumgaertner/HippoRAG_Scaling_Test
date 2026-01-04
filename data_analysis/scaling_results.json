@@ -1,0 +1,110 @@
+[
+  {
+    "document_count": 10,
+    "total_indexing_time_s": 516.1619222164154,
+    "avg_retrieval_time_s": 8.40801935195923,
+    "queries_run": 10
+  },
+  {
+    "document_count": 20,
+    "total_indexing_time_s": 928.6742599010468,
+    "avg_retrieval_time_s": 7.637364554405212,
+    "queries_run": 10
+  },
+  {
+    "document_count": 40,
+    "total_indexing_time_s": 1608.3160953521729,
+    "avg_retrieval_time_s": 10.422781443595886,
+    "queries_run": 10
+  },
+  {
+    "document_count": 80,
+    "total_indexing_time_s": 2936.6506457328796,
+    "avg_retrieval_time_s": 8.882961964607238,
+    "queries_run": 10
+  },
+  {
+    "document_count": 200,
+    "total_indexing_time_s": 8648.735266923904,
+    "avg_retrieval_time_s": 11.415673160552979,
+    "queries_run": 10
+  },
+  {
+    "document_count": 400,
+    "total_indexing_time_s": 21038.26519227028,
+    "avg_retrieval_time_s": 8.999510073661805,
+    "queries_run": 10
+  },
+  {
+    "document_count": 600,
+    "total_indexing_time_s": 34707.37053155899,
+    "avg_retrieval_time_s": 7.734585452079773,
+    "queries_run": 10
+  },
+  {
+    "document_count": 800,
+    "total_indexing_time_s": 47120.75157260895,
+    "avg_retrieval_time_s": 9.68928246498108,
+    "queries_run": 10
+  },
+  {
+    "document_count": 1000,
+    "total_indexing_time_s": 60599.901186704636,
+    "avg_retrieval_time_s": 12.341947984695434,
+    "queries_run": 10
+  },
+  {
+    "document_count": 1200,
+    "total_indexing_time_s": 75978.19259023666,
+    "avg_retrieval_time_s": 8.03947081565857,
+    "queries_run": 10
+  },
+  {
+    "document_count": 1400,
+    "total_indexing_time_s": 92858.06812000275,
+    "avg_retrieval_time_s": 9.97493236064911,
+    "queries_run": 10
+  },
+  {
+    "document_count": 1600,
+    "total_indexing_time_s": 112784.68210601807,
+    "avg_retrieval_time_s": 21.173997592926025,
+    "queries_run": 10
+  },
+  {
+    "document_count": 1800,
+    "total_indexing_time_s": 135554.6705853939,
+    "avg_retrieval_time_s": 11.85880937576294,
+    "queries_run": 10
+  },
+  {
+    "document_count": 2000,
+    "total_indexing_time_s": 160832.83269166946,
+    "avg_retrieval_time_s": 10.188488173484803,
+    "queries_run": 10
+  },
+  {
+    "document_count": 2200,
+    "total_indexing_time_s": 189472.72179937363,
+    "avg_retrieval_time_s": 5.776054525375367,
+    "queries_run": 10
+  },
+  {
+    "document_count": 2400,
+    "total_indexing_time_s": 220898.72415614128,
+    "avg_retrieval_time_s": 12.836921525001525,
+    "queries_run": 10
+  },
+  {
+    "document_count": 2600,
+    "total_indexing_time_s": 255193.3146750927,
+    "avg_retrieval_time_s": 7.178174114227295,
+    "queries_run": 10
+  },
+  {
+    "document_count": 2800,
+    "total_indexing_time_s": 296191.2636177831,
+    "avg_retrieval_time_s": 11.835685123123512,
+    "queries_run": 10
+  }
+]

@@ -1,6 +1,5 @@
-
-openai
+openai==1.91.0
 numpy==1.26.4
 sentence-transformers==3.0.1
 hipporag==2.0.0a4
-
+matplotlib==3.10.8

@@ -14,6 +14,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from data_classes.data_set import DataSet
 from hipporag import HippoRAG
+from hipporag.utils.config_utils import BaseConfig
+from models.embedding import OpenRouterEmbeddingModel
 
 def setup_env():
     """Setup environment variables for OpenRouter/OpenAI compatibility."""
@@ -34,7 +36,6 @@ def setup_env():
             
     if api_key:
         os.environ["OPENAI_API_KEY"] = api_key
-        # print("Set OPENAI_API_KEY from OpenRouter key.")
     else:
         print("Warning: OPENROUTER_API_KEY not found.")
 
@@ -43,7 +44,7 @@ def main():
     setup_env()
     
     # Configuration
-    SUBSETS = [10, 20, 40]# , 80, 160, 320, 640, 1280]
+    SUBSETS = [10, 20, 40, 80, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000]
     RETRIEVAL_QUERY_COUNT = 10
     SAVE_DIR = "hipporag_test_run"
     RESULTS_FILE = "scaling_results.json"
@@ -79,11 +80,6 @@ def main():
     if dataset.qa_pairs:
         all_queries = [qa.question for qa in dataset.qa_pairs]
     
-    # Ensure we have enough queries or cycle
-    if not all_queries:
-        print("Warning: No queries found in dataset. Using dummy queries.")
-        all_queries = ["What is the capital of France?"] * RETRIEVAL_QUERY_COUNT
-        
     retrieval_queries = all_queries[:RETRIEVAL_QUERY_COUNT]
     if len(retrieval_queries) < RETRIEVAL_QUERY_COUNT:
         print(f"Warning: Only {len(retrieval_queries)} queries available. Using all of them.")
@@ -92,19 +88,31 @@ def main():
     if os.path.exists(SAVE_DIR):
         shutil.rmtree(SAVE_DIR)
         
-    print("Initializing HippoRAG...")
-    rag = HippoRAG(
-        llm_model_name="meta-llama/llama-3.3-70b-instruct",
-        llm_base_url="https://openrouter.ai/api/v1",
-        embedding_model_name="openai/text-embedding-3-small",
-        embedding_base_url="https://openrouter.ai/api/v1",
-        save_dir=SAVE_DIR
-    )
+    print("Initializing HippoRAG with custom config...")
+    config = BaseConfig()
+    config.embedding_batch_size = 8 # Reduce from default 16 for better OpenRouter stability
+    config.llm_name = "meta-llama/llama-3.3-70b-instruct"
+    config.llm_base_url = "https://openrouter.ai/api/v1"
+    config.embedding_model_name = "openai/text-embedding-3-small"
+    config.embedding_base_url = "https://openrouter.ai/api/v1"
+    config.save_dir = SAVE_DIR
+
+    rag = HippoRAG(global_config=config)
+    
+    # Inject generic OpenRouter embedding model to fix "NoneType" error in openai client
+    print("Injecting custom OpenRouterEmbeddingModel...")
+    custom_embedding_model = OpenRouterEmbeddingModel(global_config=config)
+    rag.embedding_model = custom_embedding_model
+    if hasattr(rag, 'chunk_embedding_store'): rag.chunk_embedding_store.embedding_model = custom_embedding_model
+    if hasattr(rag, 'entity_embedding_store'): rag.entity_embedding_store.embedding_model = custom_embedding_model
+    if hasattr(rag, 'fact_embedding_store'): rag.fact_embedding_store.embedding_model = custom_embedding_model
     
     dataset_results = []
     
     cumulative_indexing_time = 0.0
     current_doc_count = 0
+    current_query_index = 0
+    
     
     # 3. Experiment Loop
     for target_count in SUBSETS:
@@ -123,10 +131,15 @@ def main():
             print("No new documents to index this step.")
         else:
             print(f"Indexing {len(new_doc_texts)} new documents...")
-            start_time = time.time()
-            rag.index(new_doc_texts)
-            end_time = time.time()
-            step_time = end_time - start_time
+            step_start_time = time.time()
+            for i, doc_text in enumerate(new_doc_texts):
+                try:
+                    rag.index([doc_text])
+                except Exception as e:
+                    print(f"\n[ERROR] Failed to index document {i}: {e}. Skipping...")
+            
+            step_end_time = time.time()
+            step_time = step_end_time - step_start_time
             cumulative_indexing_time += step_time
             print(f"Indexing Step Time: {step_time:.2f}s")
             
@@ -134,10 +147,20 @@ def main():
         current_doc_count = target_count
         
         # Retrieval
-        print(f"Running Retrieval on {len(retrieval_queries)} queries...")
+        # Select next batch of queries
+        step_queries = all_queries[current_query_index : current_query_index + RETRIEVAL_QUERY_COUNT]
+        # If we run out of unique queries, wrap around or reuse (though prompt implies "next 10" is sufficient)
+        if len(step_queries) < RETRIEVAL_QUERY_COUNT:
+            print("Warning: Recycling queries as we reached the end of the list.")
+            needed = RETRIEVAL_QUERY_COUNT - len(step_queries)
+            step_queries.extend(all_queries[:needed]) # Simple wrap around
+
+        current_query_index = (current_query_index + RETRIEVAL_QUERY_COUNT) % len(all_queries)
+
+        print(f"Running Retrieval on {len(step_queries)} queries...")
         retrieval_times = []
         
-        for i, query in enumerate(retrieval_queries):
+        for i, query in enumerate(step_queries):
             r_start = time.time()
             try:
                 _ = rag.rag_qa([query])
@@ -147,7 +170,7 @@ def main():
             retrieval_times.append(r_end - r_start)
             
             if (i+1) % 10 == 0:
-                print(f"  Processed {i+1}/{len(retrieval_queries)} queries...", end='\r')
+                print(f"  Processed {i+1}/{len(step_queries)} queries...", end='\r')
                 
         avg_retrieval_time = np.mean(retrieval_times) if retrieval_times else 0.0
         print(f"\nAverage Retrieval Time: {avg_retrieval_time:.4f}s")
